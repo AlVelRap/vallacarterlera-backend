@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vallacartelera.app.dao.ISessionDao;
+import com.vallacartelera.app.errors.exceptions.ResourceNotFoundException;
 import com.vallacartelera.app.models.Session;
 
 @Service
@@ -18,13 +19,18 @@ public class ISessionServiceImp implements ISessionService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Session> findAll() {
-		return (List<Session>) sessionDao.findAll();
+		List<Session> sessionList = sessionDao.findAll();
+		if (sessionList.isEmpty()) {
+			throw new ResourceNotFoundException("There are no Sessions in DB");
+		}
+		return sessionList;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Session findById(Long id) {
-		return sessionDao.findById(id).orElse(null);
+		return sessionDao.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException("Session with ID: " + id + " doesn´t exists in the DB!"));
 	}
 
 	@Override
