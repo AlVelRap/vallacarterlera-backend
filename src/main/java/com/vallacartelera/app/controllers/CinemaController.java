@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -51,21 +50,7 @@ public class CinemaController {
 	@GetMapping("/cinemas")
 	@JsonView({ Views.GetAllCinemas.class })
 	public ResponseEntity<?> showAll() {
-		List<Cinema> cinema = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			cinema = cinemaService.findAll();
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (cinema == null) {
-			response.put("message", "There are no Cinemas in DB");
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<List<Cinema>>(cinema, HttpStatus.OK);
+		return new ResponseEntity<List<Cinema>>(cinemaService.findAll(), HttpStatus.OK);
 	}
 
 	/**
@@ -74,21 +59,7 @@ public class CinemaController {
 	@GetMapping("/cinemas/{id}")
 	@JsonView({ Views.GetCinema.class })
 	public ResponseEntity<?> showCinema(@PathVariable Long id) {
-		Cinema cinema = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			cinema = cinemaService.findById(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (cinema == null) {
-			response.put("message", "Cinema with ID: ".concat(id.toString().concat(" doesn´t exists in the DB!")));
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<Cinema>(cinema, HttpStatus.OK);
+		return new ResponseEntity<Cinema>(cinemaService.findById(id), HttpStatus.OK);
 	}
 
 	/**
@@ -97,21 +68,7 @@ public class CinemaController {
 	@GetMapping("/movies/{id}/cinemas")
 	@JsonView({ Views.GetAllCinemas.class })
 	public ResponseEntity<?> showAllCinemasForMovie(@PathVariable Long id) {
-		List<Cinema> cinema = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			cinema = cinemaService.findAllByMovieId(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (cinema == null) {
-			response.put("message", "There are no Cinemas for Movie with ID: " + id);
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<List<Cinema>>(cinema, HttpStatus.OK);
+		return new ResponseEntity<List<Cinema>>(cinemaService.findAllByMovieId(id), HttpStatus.OK);
 	}
 
 	/**
@@ -121,27 +78,12 @@ public class CinemaController {
 	@JsonView({ Views.GetOneCinemasForMovie.class })
 	public ResponseEntity<?> showAllSessionsForCinemaForMovie(@PathVariable Long cinema_id,
 			@PathVariable Long movie_id) {
-		Cinema cinema = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			cinema = cinemaService.findByMovieIdAndCinemaId(cinema_id, movie_id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (cinema == null) {
-			response.put("message", "There are no Sessions for Movie with ID: " + movie_id + " in Cinema " + cinema_id);
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<Cinema>(cinema, HttpStatus.OK);
+		return new ResponseEntity<Cinema>(cinemaService.findByMovieIdAndCinemaId(cinema_id, movie_id), HttpStatus.OK);
 	}
 
 	@PostMapping("/cinemas")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> create(@Valid @RequestBody Cinema cinema, BindingResult result) {
-		Cinema cinemaNew = null;
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -153,14 +95,8 @@ public class CinemaController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		try {
-			cinemaNew = cinemaService.save(cinema);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
 		response.put("message", "Cinema created successfully!");
-		response.put("cinema", cinemaNew);
+		response.put("cinema", cinemaService.save(cinema));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
@@ -177,11 +113,7 @@ public class CinemaController {
 	public ResponseEntity<?> deleteOne(@PathVariable Long id) {
 		Map<String, Object> response = new HashMap<>();
 
-		try {
-			cinemaService.delete(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
+		cinemaService.delete(id);
 
 		response.put("message", "Cinema deleted successfully!");
 
@@ -195,22 +127,11 @@ public class CinemaController {
 	public ResponseEntity<?> deleteAll() {
 		Map<String, Object> response = new HashMap<>();
 
-		try {
-			cinemaService.deleteAll();
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
+		cinemaService.deleteAll();
 
 		response.put("message", "All Cinemas were deleted successfully!");
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-	}
-
-	private ResponseEntity<Map<String, Object>> dataAccessErrorResponse(DataAccessException error) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", "Error when querying the database");
-		response.put("error", error.getMessage() + ": " + error.getMostSpecificCause().getMessage());
-		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

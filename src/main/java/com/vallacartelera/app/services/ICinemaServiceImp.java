@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vallacartelera.app.dao.ICinemaDao;
+import com.vallacartelera.app.errors.exceptions.ResourceNotFoundException;
 import com.vallacartelera.app.models.Cinema;
 
 @Service
@@ -18,23 +19,37 @@ public class ICinemaServiceImp implements ICinemaService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Cinema> findAll() {
-		return (List<Cinema>) cinemaDao.findAll();
+		List<Cinema> cinemaList = cinemaDao.findAll();
+		if (cinemaList.isEmpty()) {
+			throw new ResourceNotFoundException("There are no Cinemas in DB");
+		}
+		return cinemaList;
+
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Cinema findById(Long id) {
-		return cinemaDao.findById(id).orElse(null);
+		return cinemaDao.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException("Cinema with ID: " + id + " doesn´t exists in the DB!"));
 	}
 
 	@Override
 	public List<Cinema> findAllByMovieId(Long id) {
-		return cinemaDao.findBySessions_Movie_Id(id);
+		List<Cinema> cinemaList = cinemaDao.findBySessions_Movie_Id(id);
+		if (cinemaList.isEmpty()) {
+			throw new ResourceNotFoundException("There are no Cinemas in DB");
+		}
+		return cinemaList;
 	}
 
 	@Override
 	public Cinema findByMovieIdAndCinemaId(Long cinema_id, Long movie_id) {
-		return cinemaDao.findByIdAndSessions_Movie_Id(cinema_id, movie_id);
+		Cinema cinemaList = cinemaDao.findByIdAndSessions_Movie_Id(cinema_id, movie_id);
+		if (cinemaList == null) {
+			throw new ResourceNotFoundException("There are no Cinemas in DB");
+		}
+		return cinemaList;
 	}
 
 	@Override
