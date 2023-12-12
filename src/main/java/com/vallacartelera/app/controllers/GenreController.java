@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,7 +50,7 @@ public class GenreController {
 	/**
 	 * Returns a List of all Genres in DB. Without List of Movies.
 	 */
-	@GetMapping("/genres")
+	@GetMapping(path = "/genres", produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.GetGenre.class })
 	public ResponseEntity<?> showAll() {
 		return new ResponseEntity<List<Genre>>(genreService.findAll(), HttpStatus.OK);
@@ -58,7 +59,7 @@ public class GenreController {
 	/**
 	 * Returns a Genre. With List of Movies.
 	 */
-	@GetMapping("/genres/{id}")
+	@GetMapping(path = "/genres/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.GetGenre.class })
 	public ResponseEntity<?> showOne(@PathVariable(value = "id") Long id) {
 		return new ResponseEntity<Genre>(genreService.findById(id), HttpStatus.OK);
@@ -67,7 +68,7 @@ public class GenreController {
 	/**
 	 * This method create a Genre
 	 */
-	@PostMapping("/genres")
+	@PostMapping(path = "/genres", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> create(@Valid @RequestBody Genre genre, BindingResult result) {
 		Map<String, Object> response = new HashMap<>();
@@ -91,7 +92,7 @@ public class GenreController {
 	 * or Id already exists in DB will add it to the movie, if not, this method will
 	 * create and add to movie that Actor.
 	 */
-	@PostMapping("/movies/{id}/genres")
+	@PostMapping(path = "/movies/{id}/genres", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.PostActor.class })
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @RequestBody Genre genre) {
@@ -111,7 +112,7 @@ public class GenreController {
 	/**
 	 * Delete an Actor from DB.
 	 */
-	@DeleteMapping("/genres/{id}")
+	@DeleteMapping(path = "/genres/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 		Map<String, Object> response = new HashMap<>();
 
@@ -125,7 +126,7 @@ public class GenreController {
 	/**
 	 * Delete an actor from a movie, but not delete Actor from DB.
 	 */
-	@DeleteMapping("movies/{movieId}/genres/{genreId}")
+	@DeleteMapping(path = "movies/{movieId}/genres/{genreId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> deleteActorFromMovie(@PathVariable("movieId") Long movieId,
 			@PathVariable("genreId") Long genreId) {
 		Map<String, Object> response = new HashMap<>();
@@ -138,7 +139,7 @@ public class GenreController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/genres")
+	@DeleteMapping(path = "/genres", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> deleteAll() {
 		Map<String, Object> response = new HashMap<>();
 
