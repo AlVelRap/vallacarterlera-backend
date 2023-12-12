@@ -143,7 +143,7 @@ public class MovieController {
 
 		movieService.deleteAll();
 
-		response.put("message", "All Sessions were deleted successfully!");
+		response.put("message", "All Movies were deleted successfully!");
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
