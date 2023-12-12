@@ -104,21 +104,7 @@ public class ActorController {
 	@GetMapping(path="/actors/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.GetActor.class })
 	public ResponseEntity<?> showOne(@PathVariable(value = "id") Long id) {
-		Actor actor = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			actor = actorService.findById(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (actor == null) {
-			response.put("message", "Actor with ID: ".concat(id.toString().concat(" doesn´t exists in the DB!")));
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<Actor>(actor, HttpStatus.OK);
+		return new ResponseEntity<Actor>(actorService.findById(id), HttpStatus.OK);
 	}
 
 	/**
