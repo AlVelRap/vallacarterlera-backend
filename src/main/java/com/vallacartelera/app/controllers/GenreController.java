@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -51,23 +50,9 @@ public class GenreController {
 	 * Returns a List of all Genres in DB. Without List of Movies.
 	 */
 	@GetMapping("/genres")
-	@JsonView({ Views.GetGenre.class }) // Review this View
+	@JsonView({ Views.GetGenre.class })
 	public ResponseEntity<?> showAll() {
-		List<Genre> genres = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			genres = genreService.findAll();
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (genres == null) {
-			response.put("message", "There are no Genres in DB");
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<List<Genre>>(genres, HttpStatus.OK);
+		return new ResponseEntity<List<Genre>>(genreService.findAll(), HttpStatus.OK);
 	}
 
 	/**
@@ -76,21 +61,7 @@ public class GenreController {
 	@GetMapping("/genres/{id}")
 	@JsonView({ Views.GetActor.class })
 	public ResponseEntity<?> showOne(@PathVariable(value = "id") Long id) {
-		Genre genre = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			genre = genreService.findById(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (genre == null) {
-			response.put("message", "Genre with ID: ".concat(id.toString().concat(" doesn´t exists in the DB!")));
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<Genre>(genre, HttpStatus.OK);
+		return new ResponseEntity<Genre>(genreService.findById(id), HttpStatus.OK);
 	}
 
 	/**
@@ -99,7 +70,6 @@ public class GenreController {
 	@PostMapping("/genres")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> create(@Valid @RequestBody Genre genre, BindingResult result) {
-		Genre genreNew = null;
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -111,14 +81,8 @@ public class GenreController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		try {
-			genreNew = genreService.save(genre);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
 		response.put("message", "Genre created successfully!");
-		response.put("genre", genreNew);
+		response.put("genre", genreService.save(genre));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
@@ -131,17 +95,10 @@ public class GenreController {
 	@JsonView({ Views.PostActor.class })
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @RequestBody Genre genre) {
-		Genre genreNew = null;
 		Map<String, Object> response = new HashMap<>();
 
-		try {
-			genreNew = genreService.addGenreToMovie(movieId, genre);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
 		response.put("message", "Genre added to Movie with ID: " + movieId + " successfully!");
-		response.put("genre", genreNew);
+		response.put("genre", genreService.addGenreToMovie(movieId, genre));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
@@ -156,14 +113,9 @@ public class GenreController {
 	 */
 	@DeleteMapping("/genres/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
-
 		Map<String, Object> response = new HashMap<>();
 
-		try {
-			genreService.delete(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
+		genreService.delete(id);
 
 		response.put("message", "Genre deleted successfully!");
 
@@ -176,14 +128,9 @@ public class GenreController {
 	@DeleteMapping("movies/{movieId}/genres/{genreId}")
 	public ResponseEntity<?> deleteActorFromMovie(@PathVariable("movieId") Long movieId,
 			@PathVariable("genreId") Long genreId) {
-
 		Map<String, Object> response = new HashMap<>();
 
-		try {
-			genreService.deleteGenreFromMovie(movieId, genreId);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
+		genreService.deleteGenreFromMovie(movieId, genreId);
 
 		response.put("message",
 				"Genre with ID: " + genreId + " deleted successfully from Movie with ID: " + movieId + "!");
@@ -193,25 +140,13 @@ public class GenreController {
 
 	@DeleteMapping("/genres")
 	public ResponseEntity<?> deleteAll() {
-
 		Map<String, Object> response = new HashMap<>();
 
-		try {
-			genreService.deleteAll();
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
+		genreService.deleteAll();
 
 		response.put("message", "All Genres were deleted successfully!");
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-	}
-
-	private ResponseEntity<Map<String, Object>> dataAccessErrorResponse(DataAccessException error) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", "Error when querying the database");
-		response.put("error", error.getMessage() + ": " + error.getMostSpecificCause().getMessage());
-		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

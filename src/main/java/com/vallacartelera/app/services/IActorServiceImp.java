@@ -2,8 +2,6 @@ package com.vallacartelera.app.services;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +14,6 @@ import com.vallacartelera.app.models.Movie;
 
 @Service
 public class IActorServiceImp implements IActorService {
-
-	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
 	private IActorDao actorDao;
