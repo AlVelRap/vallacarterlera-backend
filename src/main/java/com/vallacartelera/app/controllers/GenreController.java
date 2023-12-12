@@ -59,7 +59,7 @@ public class GenreController {
 	 * Returns a Genre. With List of Movies.
 	 */
 	@GetMapping("/genres/{id}")
-	@JsonView({ Views.GetActor.class })
+	@JsonView({ Views.GetGenre.class })
 	public ResponseEntity<?> showOne(@PathVariable(value = "id") Long id) {
 		return new ResponseEntity<Genre>(genreService.findById(id), HttpStatus.OK);
 	}
