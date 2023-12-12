@@ -28,13 +28,16 @@ public class IActorServiceImp implements IActorService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Actor> findAll() {
-		return (List<Actor>) actorDao.findAll();
+		List<Actor> actorList = actorDao.findAll();
+		if (actorList.isEmpty()) {
+			throw new ResourceNotFoundException("There are no Actors in DB");
+		}
+		return actorList;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Actor findById(Long id) {
-//		return actorDao.findById(id).orElse(null);
 		return actorDao.findById(id).orElseThrow(
 				() -> new ResourceNotFoundException("Actor with ID: " + id + " doesn´t exists in the DB!"));
 	}
@@ -74,7 +77,7 @@ public class IActorServiceImp implements IActorService {
 
 			movie.addActor(actorRequest);
 			return actorDao.save(actorRequest);
-		}).orElse(null);
+		}).orElseThrow(() -> new ResourceNotFoundException("Movie with ID: " + idMovie + " doesn't exists in DB!"));
 		return actor;
 	}
 
@@ -94,9 +97,9 @@ public class IActorServiceImp implements IActorService {
 	@Transactional
 	public void deleteActorFromMovie(Long movieId, Long actorId) {
 
-		logger.info("Actor id:" + actorId + ", Movie Id: " + movieId);
-
-		Movie movie = movieDao.findById(movieId).orElse(null);
+		Movie movie = movieDao.findById(movieId).orElseThrow(
+				() -> new ResourceNotFoundException("Movie with ID: " + movieId + " doesn't exists in DB!"));
+		;
 
 		if (movie != null) {
 			movie.removeActor(actorId);

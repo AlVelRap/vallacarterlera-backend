@@ -73,26 +73,9 @@ public class ActorController {
 	@JsonView({ Views.GetAllActor.class })
 	@GetMapping(path = "/actors",produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> showAll() {
-		List<Actor> actors = null;
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			actors = actorService.findAll();
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
-		if (actors == null) {
-			response.put("message", "There are no Actors in DB");
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<List<Actor>>(actors, HttpStatus.OK);
+		return new ResponseEntity<List<Actor>>(actorService.findAll(), HttpStatus.OK);
 	}
 
-	/**
-	 * Returns a an Actors. With List of Movies.
-	 */
 	@Operation(
 			description = "Returns an Actor. With List of Movies.",
 			summary = "An Actor. With Movie's List.",
@@ -113,7 +96,6 @@ public class ActorController {
 	@PostMapping(path = "/actors", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> create(@Valid @RequestBody Actor actor, BindingResult result) {
-		Actor actorNew = null;
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -125,14 +107,8 @@ public class ActorController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		try {
-			actorNew = actorService.save(actor);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
 		response.put("message", "Actor created successfully!");
-		response.put("actor", actorNew);
+		response.put("actor", actorService.save(actor));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
@@ -145,17 +121,9 @@ public class ActorController {
 	@JsonView({ Views.PostActor.class })
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @RequestBody Actor actor) {
-		Actor actorNew = null;
 		Map<String, Object> response = new HashMap<>();
-
-		try {
-			actorNew = actorService.addActorToMovie(movieId, actor);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
 		response.put("message", "Actor added to Movie with ID: " + movieId + " successfully!");
-		response.put("actor", actorNew);
+		response.put("actor", actorService.addActorToMovie(movieId, actor));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
@@ -170,17 +138,9 @@ public class ActorController {
 	 */
 	@DeleteMapping("/actors/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
-
 		Map<String, Object> response = new HashMap<>();
-
-		try {
-			actorService.delete(id);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
+		actorService.delete(id);
 		response.put("message", "Actor deleted successfully!");
-
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
@@ -190,42 +150,20 @@ public class ActorController {
 	@DeleteMapping("movies/{movieId}/actors/{actorId}")
 	public ResponseEntity<?> deleteActorFromMovie(@PathVariable("movieId") Long movieId,
 			@PathVariable("actorId") Long actorId) {
-
 		Map<String, Object> response = new HashMap<>();
-
-		try {
-			actorService.deleteActorFromMovie(movieId, actorId);
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
+		actorService.deleteActorFromMovie(movieId, actorId);
 		response.put("message",
 				"Actor with ID: " + actorId + " deleted successfully from Movie with ID: " + movieId + "!");
-
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/actors")
 	public ResponseEntity<?> deleteAll() {
-
 		Map<String, Object> response = new HashMap<>();
-
-		try {
-			actorService.deleteAll();
-		} catch (DataAccessException e) {
-			return dataAccessErrorResponse(e);
-		}
-
+		actorService.deleteAll();
 		response.put("message", "All Actors were deleted successfully!");
-
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
-	private ResponseEntity<Map<String, Object>> dataAccessErrorResponse(DataAccessException error) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", "Error when querying the database");
-		response.put("error", error.getMessage() + ": " + error.getMostSpecificCause().getMessage());
-		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 
 }
