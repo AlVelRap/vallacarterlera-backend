@@ -31,7 +31,7 @@ public class IMovieServiceImp implements IMovieService {
 	public List<Movie> findAllByCinemaId(Long id) {
 		List<Movie> movieList = movieDao.findBySessions_Cinema_Id(id);
 		if (movieList.isEmpty()) {
-			throw new ResourceNotFoundException("There are no Movies in DB");
+			throw new ResourceNotFoundException("There are no Movies for Cinema with ID: " + id);
 		}
 		return movieList;
 	}
@@ -42,7 +42,7 @@ public class IMovieServiceImp implements IMovieService {
 		Movie movie = movieDao.findByIdAndSessions_Cinema_Id(movieId, cinemaId);
 		if (movie == null) {
 			throw new ResourceNotFoundException(
-					"There are no Cinema with ID: " + cinemaId + " for Movie with ID: " + movieId);
+					"There are no Movie with ID: " + movieId + " for Cinema with ID: " + cinemaId);
 		}
 		return movie;
 	}
