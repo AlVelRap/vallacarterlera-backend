@@ -44,12 +44,13 @@ public class ICinemaServiceImp implements ICinemaService {
 	}
 
 	@Override
-	public Cinema findByMovieIdAndCinemaId(Long cinema_id, Long movie_id) {
-		Cinema cinemaList = cinemaDao.findByIdAndSessions_Movie_Id(cinema_id, movie_id);
-		if (cinemaList == null) {
-			throw new ResourceNotFoundException("There are no Cinemas in DB");
+	public Cinema findByMovieIdAndCinemaId(Long cinemaId, Long movieId) {
+		Cinema cinema = cinemaDao.findByIdAndSessions_Movie_Id(cinemaId, movieId);
+		if (cinema == null) {
+			throw new ResourceNotFoundException(
+					"There are no Cinema with ID: " + cinemaId + " for Movie with ID: " + movieId);
 		}
-		return cinemaList;
+		return cinema;
 	}
 
 	@Override
