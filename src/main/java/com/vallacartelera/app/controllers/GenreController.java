@@ -55,6 +55,7 @@ public class GenreController {
 	/**
 	 * Returns a List of all Genres in DB. Without List of Movies.
 	 */
+
 	@Operation(description = "Returns a List of all Genres in DB. Without List of Movies.", summary = "List all Genres. Without Movie's List", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Genre.class))) }),
@@ -71,6 +72,7 @@ public class GenreController {
 	/**
 	 * Returns a Genre. With List of Movies.
 	 */
+
 	@Operation(description = "Returns a Genre. With List of Movies.", summary = "Show One Genre. With Movie's List.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
@@ -87,6 +89,7 @@ public class GenreController {
 	/**
 	 * This method create a Genre
 	 */
+
 	@Operation(description = "Creates a Genre without connecting it to any movie.", summary = "Create an Genre.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
@@ -118,6 +121,7 @@ public class GenreController {
 	 * or Id already exists in DB will add it to the movie, if not, this method will
 	 * create and add to movie that Genre.
 	 */
+
 	@Operation(description = "Add a Genre to a movie. With the name of the genre or with the Id. If Name or Id already exists in DB will add it to the movie, if not, this method will create and add to movie that Genre.", summary = "Add Genre to Movie.", responses = {
 			@ApiResponse(responseCode = "201", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
@@ -173,6 +177,7 @@ public class GenreController {
 	/**
 	 * Delete an Genre from a movie, but not delete Genre from DB.
 	 */
+
 	@Operation(description = "Delete an Genre from a movie, but not delete Genre from DB.", summary = "Delete Genre from Movie.", responses = {
 			@ApiResponse(responseCode = "200", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
@@ -192,6 +197,7 @@ public class GenreController {
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
+
 
 	@Operation(description = "Delete all Genres from DB.", summary = "Delete All Genres.", responses = {
 			@ApiResponse(responseCode = "200", content = {
