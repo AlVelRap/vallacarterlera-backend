@@ -24,11 +24,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.vallacartelera.app.errors.models.ErrorMessage;
 import com.vallacartelera.app.models.Actor;
 import com.vallacartelera.app.services.IActorService;
 import com.vallacartelera.app.views.Views;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,46 +46,33 @@ public class ActorController {
 	// TODO:
 	// - Check all errors and returns, and optimize
 	// - Review response of: POST methods
-	// - Swagger Annotations
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
 	private IActorService actorService;
 
-	@Operation(
-			description = "Returns a List of all Actors in DB. Without List of Movies.",
-			summary = "List all Actors. Without Movie's List",
-			responses = {
-					@ApiResponse(
-							responseCode = "200",
-							description = "Success", 
-							content = {
-									@Content(
-											mediaType = MediaType.APPLICATION_JSON_VALUE,
-											schema = @Schema(implementation = Actor.class)
-											)
-									} 
-							),
-					@ApiResponse(responseCode = "500"),
-					@ApiResponse(responseCode = "404")
-			}
-			)
+	@Operation(description = "Returns a List of all Actors in DB. Without List of Movies.", summary = "List all Actors. Without Movie's List", responses = {
+			@ApiResponse(responseCode = "200", description = "Success", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Actor.class))) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@JsonView({ Views.GetAllActor.class })
-	@GetMapping(path = "/actors",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/actors", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> showAll() {
 		return new ResponseEntity<List<Actor>>(actorService.findAll(), HttpStatus.OK);
 	}
 
-	@Operation(
-			description = "Returns an Actor. With List of Movies.",
-			summary = "An Actor. With Movie's List.",
-			responses = {
-					@ApiResponse(responseCode = "200",description = "Success"),
-					@ApiResponse(responseCode = "500"),
-					@ApiResponse(responseCode = "404")
-			})
-	@GetMapping(path="/actors/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(description = "Returns an Actor. With List of Movies.", summary = "Show One Actor. With Movie's List.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
+	@GetMapping(path = "/actors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.GetActor.class })
 	public ResponseEntity<?> showOne(@PathVariable(value = "id") Long id) {
 		return new ResponseEntity<Actor>(actorService.findById(id), HttpStatus.OK);
@@ -92,9 +81,16 @@ public class ActorController {
 	/**
 	 * This method create an Actor
 	 */
+	@Operation(description = "Creates an Actor without connecting it to any movie.", summary = "Create an Actor.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PostMapping(path = "/actors", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> create(@Valid @RequestBody Actor actor, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @JsonView(Views.GetAllActor.class) @RequestBody Actor actor, BindingResult result) {
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -116,18 +112,33 @@ public class ActorController {
 	 * or Id already exists in DB will add it to the movie, if not, this method will
 	 * create and add to movie that Actor.
 	 */
-	@PostMapping("/movies/{id}/actors")
+	@Operation(description = "Add an actor to a movie. With the name of the actor or with the Id. If Name or Id already exists in DB will add it to the movie, if not, this method will create and add to movie that Actor.", summary = "Add Actor to Movie.", responses = {
+			@ApiResponse(responseCode = "201", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
+	@PostMapping(path = "/movies/{id}/actors", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.PostActor.class })
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @RequestBody Actor actor) {
+	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @JsonView(Views.GetAllActor.class) @RequestBody Actor actor) {
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", "Actor added to Movie with ID: " + movieId + " successfully!");
 		response.put("actor", actorService.addActorToMovie(movieId, actor));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/actors/{id}")
-	public ResponseEntity<?> update(@Valid @RequestBody Actor actor, BindingResult result) {
+	@Operation(description = "Update an Actor with its Id.", summary = "Update Actor.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
+	@PutMapping(path = "/actors/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> update(@Valid @JsonView(Views.GetAllActor.class) @RequestBody Actor actor,
+			BindingResult result) {
 		// TODO
 		return null;
 	}
@@ -135,6 +146,13 @@ public class ActorController {
 	/**
 	 * Delete an Actor from DB.
 	 */
+	@Operation(description = "Delete an Actor from DB.", summary = "Delete Actor.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@DeleteMapping("/actors/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 		Map<String, Object> response = new HashMap<>();
@@ -146,6 +164,13 @@ public class ActorController {
 	/**
 	 * Delete an actor from a movie, but not delete Actor from DB.
 	 */
+	@Operation(description = "Delete an actor from a movie, but not delete Actor from DB.", summary = "Delete Actor from Movie.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@DeleteMapping("movies/{movieId}/actors/{actorId}")
 	public ResponseEntity<?> deleteActorFromMovie(@PathVariable("movieId") Long movieId,
 			@PathVariable("actorId") Long actorId) {
@@ -156,6 +181,13 @@ public class ActorController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
+	@Operation(description = "Delete all Actors from DB.", summary = "Delete All Actors.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Actor.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@DeleteMapping("/actors")
 	public ResponseEntity<?> deleteAll() {
 		Map<String, Object> response = new HashMap<>();
@@ -163,6 +195,5 @@ public class ActorController {
 		response.put("message", "All Actors were deleted successfully!");
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
-
 
 }
