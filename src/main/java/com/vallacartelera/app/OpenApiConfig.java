@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 				title = "OpenApi Specification - Vallacartelera", 
 				version = "1.0", 
 				license = @License(
-						name = "Nombre Licencia", 
+						name = "Apache 2.0", 
 						url = "https://direcion-licencia.com"
 						),
 				termsOfService = "Terms of service"
