@@ -24,11 +24,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.vallacartelera.app.models.Actor;
+import com.vallacartelera.app.errors.models.ErrorMessage;
 import com.vallacartelera.app.models.Genre;
 import com.vallacartelera.app.services.IGenreService;
 import com.vallacartelera.app.views.Views;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -50,6 +55,13 @@ public class GenreController {
 	/**
 	 * Returns a List of all Genres in DB. Without List of Movies.
 	 */
+	@Operation(description = "Returns a List of all Genres in DB. Without List of Movies.", summary = "List all Genres. Without Movie's List", responses = {
+			@ApiResponse(responseCode = "200", description = "Success", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Genre.class))) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@GetMapping(path = "/genres", produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.GetGenre.class })
 	public ResponseEntity<?> showAll() {
@@ -59,6 +71,13 @@ public class GenreController {
 	/**
 	 * Returns a Genre. With List of Movies.
 	 */
+	@Operation(description = "Returns a Genre. With List of Movies.", summary = "Show One Genre. With Movie's List.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@GetMapping(path = "/genres/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.GetGenre.class })
 	public ResponseEntity<?> showOne(@PathVariable(value = "id") Long id) {
@@ -68,6 +87,13 @@ public class GenreController {
 	/**
 	 * This method create a Genre
 	 */
+	@Operation(description = "Creates a Genre without connecting it to any movie.", summary = "Create an Genre.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PostMapping(path = "/genres", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> create(@Valid @RequestBody Genre genre, BindingResult result) {
@@ -88,14 +114,21 @@ public class GenreController {
 	}
 
 	/**
-	 * Add an actor to a movie. With the name of the actor or with the Id. If Name
+	 * Add a genre to a movie. With the name of the genre or with the Id. If Name
 	 * or Id already exists in DB will add it to the movie, if not, this method will
-	 * create and add to movie that Actor.
+	 * create and add to movie that Genre.
 	 */
+	@Operation(description = "Add a Genre to a movie. With the name of the genre or with the Id. If Name or Id already exists in DB will add it to the movie, if not, this method will create and add to movie that Genre.", summary = "Add Genre to Movie.", responses = {
+			@ApiResponse(responseCode = "201", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PostMapping(path = "/movies/{id}/genres", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.PostActor.class })
+	@JsonView({ Views.PostGenre.class })
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @RequestBody Genre genre) {
+	public ResponseEntity<?> createMovieGenre(@PathVariable(value = "id") Long movieId, @RequestBody Genre genre) {
 		Map<String, Object> response = new HashMap<>();
 
 		response.put("message", "Genre added to Movie with ID: " + movieId + " successfully!");
@@ -103,15 +136,29 @@ public class GenreController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/genres/{id}")
-	public ResponseEntity<?> update(@Valid @RequestBody Actor actor, BindingResult result) {
+	@Operation(description = "Update an Genre with its Id.", summary = "Update Genre.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
+	@PutMapping(path = "/genres/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> update(@Valid @RequestBody Genre genre, BindingResult result) {
 		// TODO
 		return null;
 	}
 
 	/**
-	 * Delete an Actor from DB.
+	 * Delete an Genre from DB.
 	 */
+	@Operation(description = "Delete an Genre from DB.", summary = "Delete Genre.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@DeleteMapping(path = "/genres/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 		Map<String, Object> response = new HashMap<>();
@@ -124,10 +171,17 @@ public class GenreController {
 	}
 
 	/**
-	 * Delete an actor from a movie, but not delete Actor from DB.
+	 * Delete an Genre from a movie, but not delete Genre from DB.
 	 */
+	@Operation(description = "Delete an Genre from a movie, but not delete Genre from DB.", summary = "Delete Genre from Movie.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@DeleteMapping(path = "movies/{movieId}/genres/{genreId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> deleteActorFromMovie(@PathVariable("movieId") Long movieId,
+	public ResponseEntity<?> deleteGenreFromMovie(@PathVariable("movieId") Long movieId,
 			@PathVariable("genreId") Long genreId) {
 		Map<String, Object> response = new HashMap<>();
 
@@ -139,6 +193,13 @@ public class GenreController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
+	@Operation(description = "Delete all Genres from DB.", summary = "Delete All Genres.", responses = {
+			@ApiResponse(responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Genre.class)) }),
+			@ApiResponse(responseCode = "500", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
+			@ApiResponse(responseCode = "404", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@DeleteMapping(path = "/genres", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> deleteAll() {
 		Map<String, Object> response = new HashMap<>();
