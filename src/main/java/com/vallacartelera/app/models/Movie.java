@@ -29,11 +29,11 @@ public class Movie implements Serializable {
 
 	@Id
 	@JsonView({ Views.GetSession.class, Views.GetMovie.class, Views.GetAllMovies.class, Views.GetCinema.class,
-			Views.GetOneMovieForCinema.class, Views.GetActor.class })
+			Views.GetOneMovieForCinema.class, Views.GetActor.class, Views.GetSessionForCinema.class })
 	private Long id;
 	@NotEmpty
 	@JsonView({ Views.GetMovie.class, Views.GetAllMovies.class, Views.GetCinema.class, Views.GetSession.class,
-			Views.GetActor.class })
+			Views.GetActor.class, Views.GetSessionForCinema.class })
 	private String title;
 	private Integer year;
 	private String director;

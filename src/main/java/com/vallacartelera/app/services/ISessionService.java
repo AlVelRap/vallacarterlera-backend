@@ -8,6 +8,10 @@ public interface ISessionService {
 	public List<Session> findAll();
 
 	public Session findById(Long id);
+	
+	public List<Session> findByMovieId(Long movieId);
+	
+	public List<Session> findByCinemaId(Long cinemaId);
 
 	public Session save(Session session);
 

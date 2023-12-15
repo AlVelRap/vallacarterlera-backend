@@ -6,6 +6,8 @@ public class Views {
 //	public static interface GetAllCinemasForMovie {}
 	public static interface GetOneCinemasForMovie {}
 	public static interface GetSession {}
+	public static interface GetSessionForMovie {}
+	public static interface GetSessionForCinema {}
 	public static interface GetMovie {}
 	public static interface GetAllMovies {}
 //	public static interface GetAllMoviesForCinema {}

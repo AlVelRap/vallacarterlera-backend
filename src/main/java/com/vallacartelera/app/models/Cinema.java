@@ -24,7 +24,7 @@ public class Cinema implements Serializable {
 
 	@Id
 	@JsonView({ Views.GetSession.class, Views.GetCinema.class, Views.GetMovie.class, Views.GetAllCinemas.class,
-			Views.GetOneCinemasForMovie.class })
+			Views.GetOneCinemasForMovie.class, Views.GetSessionForMovie.class })
 	private Long id;
 
 	@NotEmpty
