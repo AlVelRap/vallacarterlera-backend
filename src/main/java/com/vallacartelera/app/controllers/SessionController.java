@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.vallacartelera.app.errors.models.ErrorMessage;
-import com.vallacartelera.app.models.Cinema;
 import com.vallacartelera.app.models.Session;
 import com.vallacartelera.app.services.ISessionService;
 import com.vallacartelera.app.views.Views;
@@ -90,10 +89,9 @@ public class SessionController {
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@GetMapping(path = "/sessions/movies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.GetSession.class })
+	@JsonView({ Views.GetSessionForMovie.class })
 	public ResponseEntity<?> showSessionsForMovie(@PathVariable Long id) {
-		// TODO
-		return null;
+		return new ResponseEntity<List<Session>>(sessionService.findByMovieId(id), HttpStatus.OK);
 	}
 
 	@Operation(description = "Returns a List of all Sessions for a Cinema.", summary = "List all Sessions for Cinema", responses = {
@@ -104,10 +102,9 @@ public class SessionController {
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@GetMapping(path = "/sessions/cinemas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.GetSession.class })
+	@JsonView({ Views.GetSessionForCinema.class })
 	public ResponseEntity<?> showSessionsForCinema(@PathVariable Long id) {
-		// TODO
-		return null;
+		return new ResponseEntity<List<Session>>(sessionService.findByCinemaId(id), HttpStatus.OK);
 	}
 
 	@Operation(description = "Creates a Session.", summary = "Create Session", responses = {

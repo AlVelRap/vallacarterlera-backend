@@ -22,7 +22,8 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "sessions")
-@JsonView({ Views.GetSession.class, Views.GetCinema.class, Views.GetMovie.class, Views.GetOneMovieForCinema.class,
+@JsonView({ Views.GetSession.class, Views.GetSessionForCinema.class, Views.GetSessionForMovie.class,
+		Views.GetCinema.class, Views.GetMovie.class, Views.GetOneMovieForCinema.class,
 		Views.GetOneCinemasForMovie.class })
 public class Session implements Serializable {
 
@@ -35,18 +36,15 @@ public class Session implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cinema_id")
-	@JsonView({ Views.GetSession.class, Views.GetMovie.class })
+	@JsonView({ Views.GetSession.class, Views.GetMovie.class, Views.GetSessionForMovie.class })
 	@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 	private Cinema cinema;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "movie_id")
-	@JsonView({ Views.GetSession.class, Views.GetCinema.class })
+	@JsonView({ Views.GetSession.class, Views.GetCinema.class, Views.GetSessionForCinema.class })
 	@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 	private Movie movie;
-
-//	@NotEmpty
-//	private String hour; // Delete this field and put this hour in session date
 
 	@NotNull
 	@Column(name = "late_session")
