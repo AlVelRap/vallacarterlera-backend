@@ -125,7 +125,8 @@ public class CinemaController {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PostMapping(path = "/cinemas", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> create(@Valid @RequestBody Cinema cinema, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @JsonView(Views.GetAllCinemas.class) @RequestBody Cinema cinema,
+			BindingResult result) {
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -149,10 +150,32 @@ public class CinemaController {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
+	@JsonView({ Views.GetAllCinemas.class })
 	@PutMapping(path = "/cinemas/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> update(@Valid @RequestBody Cinema cinema, BindingResult result) {
-		// TODO
-		return null;
+	public ResponseEntity<?> update(@PathVariable Long id,
+			@Valid @JsonView(Views.GetAllCinemas.class) @RequestBody Cinema cinema, BindingResult result) {
+		Cinema cinemaActual = null;
+		Map<String, Object> response = new HashMap<>();
+
+		if (result.hasErrors()) {
+			List<String> errors = result.getFieldErrors().stream().map(err -> {
+				return "Field '" + err.getField() + "' " + err.getDefaultMessage();
+			}).collect(Collectors.toList());
+
+			response.put("errors", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		cinemaActual = cinemaService.findById(id);
+
+		cinemaActual.setLocation(cinema.getLocation());
+		cinemaActual.setName(cinema.getName());
+		cinemaActual.setPhone(cinema.getPhone());
+
+		response.put("message", "Cinema with ID:" + id + " was updated succesfully!");
+		response.put("cinema", cinemaService.save(cinemaActual));
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	/**
