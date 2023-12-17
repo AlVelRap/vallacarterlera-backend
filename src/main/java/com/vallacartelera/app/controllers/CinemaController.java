@@ -154,9 +154,7 @@ public class CinemaController {
 	@PutMapping(path = "/cinemas/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> update(@PathVariable Long id,
 			@Valid @JsonView(Views.GetAllCinemas.class) @RequestBody Cinema cinema, BindingResult result) {
-		Cinema cinemaActual = null;
 		Map<String, Object> response = new HashMap<>();
-
 		if (result.hasErrors()) {
 			List<String> errors = result.getFieldErrors().stream().map(err -> {
 				return "Field '" + err.getField() + "' " + err.getDefaultMessage();
@@ -166,7 +164,7 @@ public class CinemaController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		cinemaActual = cinemaService.findById(id);
+		Cinema cinemaActual = cinemaService.findById(id);
 
 		cinemaActual.setLocation(cinema.getLocation());
 		cinemaActual.setName(cinema.getName());
