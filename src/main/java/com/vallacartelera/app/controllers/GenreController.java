@@ -148,9 +148,26 @@ public class GenreController {
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PutMapping(path = "/genres/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> update(@Valid @RequestBody Genre genre, BindingResult result) {
-		// TODO
-		return null;
+	@JsonView({Views.PostGenre.class})
+	public ResponseEntity<?> update(@PathVariable Long id,@Valid @JsonView({Views.PostGenre.class}) @RequestBody Genre genre, BindingResult result) {
+		Map<String, Object> response = new HashMap<>();
+		if (result.hasErrors()) {
+			List<String> errors = result.getFieldErrors().stream().map(err -> {
+				return "Field '" + err.getField() + "' " + err.getDefaultMessage();
+			}).collect(Collectors.toList());
+
+			response.put("errors", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		Genre genreActual = genreService.findById(id);
+
+		genreActual.setName(genre.getName());
+
+		response.put("message", "Genre with ID:" + id + " was updated succesfully!");
+		response.put("session", genreService.save(genreActual));
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	/**

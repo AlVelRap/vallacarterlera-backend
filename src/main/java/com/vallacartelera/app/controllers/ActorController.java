@@ -90,7 +90,8 @@ public class ActorController {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PostMapping(path = "/actors", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> create(@Valid @JsonView(Views.GetAllActor.class) @RequestBody Actor actor, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @JsonView(Views.GetAllActor.class) @RequestBody Actor actor,
+			BindingResult result) {
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -122,7 +123,8 @@ public class ActorController {
 	@PostMapping(path = "/movies/{id}/actors", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@JsonView({ Views.PostActor.class })
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId, @JsonView(Views.GetAllActor.class) @RequestBody Actor actor) {
+	public ResponseEntity<?> createMovieActor(@PathVariable(value = "id") Long movieId,
+			@JsonView(Views.GetAllActor.class) @RequestBody Actor actor) {
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", "Actor added to Movie with ID: " + movieId + " successfully!");
 		response.put("actor", actorService.addActorToMovie(movieId, actor));
@@ -137,10 +139,27 @@ public class ActorController {
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PutMapping(path = "/actors/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> update(@Valid @JsonView(Views.GetAllActor.class) @RequestBody Actor actor,
-			BindingResult result) {
-		// TODO
-		return null;
+	@JsonView(Views.GetAllActor.class)
+	public ResponseEntity<?> update(@PathVariable Long id,
+			@Valid @JsonView(Views.GetAllActor.class) @RequestBody Actor actor, BindingResult result) {
+		Map<String, Object> response = new HashMap<>();
+		if (result.hasErrors()) {
+			List<String> errors = result.getFieldErrors().stream().map(err -> {
+				return "Field '" + err.getField() + "' " + err.getDefaultMessage();
+			}).collect(Collectors.toList());
+
+			response.put("errors", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		Actor actorActual = actorService.findById(id);
+
+		actorActual.setName(actor.getName());
+
+		response.put("message", "Actor with ID:" + id + " was updated succesfully!");
+		response.put("session", actorService.save(actorActual));
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	/**

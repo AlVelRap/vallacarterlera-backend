@@ -141,9 +141,30 @@ public class SessionController {
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
 	@PutMapping(path = "/sessions/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> update(@Valid @RequestBody Session session, BindingResult result) {
-		// TODO
-		return null;
+	@JsonView(Views.GetSession.class)
+	public ResponseEntity<?> update(@PathVariable Long id,
+			@Valid @JsonView(Views.GetSession.class) @RequestBody Session session, BindingResult result) {
+		Map<String, Object> response = new HashMap<>();
+		if (result.hasErrors()) {
+			List<String> errors = result.getFieldErrors().stream().map(err -> {
+				return "Field '" + err.getField() + "' " + err.getDefaultMessage();
+			}).collect(Collectors.toList());
+
+			response.put("errors", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		Session sessionActual = sessionService.findById(id);
+
+		sessionActual.setCinema(session.getCinema());
+		sessionActual.setMovie(session.getMovie());
+		sessionActual.setLateSession(session.getLateSession());
+		sessionActual.setSessionDate(session.getSessionDate());
+
+		response.put("message", "Session with ID:" + id + " was updated succesfully!");
+		response.put("session", sessionService.save(sessionActual));
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	@Operation(description = "Delete a Session from DB.", summary = "Delete Session", responses = {
