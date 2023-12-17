@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.vallacartelera.app.errors.models.ErrorMessage;
-import com.vallacartelera.app.models.Cinema;
 import com.vallacartelera.app.models.Movie;
 import com.vallacartelera.app.services.IMovieService;
 import com.vallacartelera.app.views.Views;
