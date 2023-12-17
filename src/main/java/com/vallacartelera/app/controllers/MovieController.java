@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.vallacartelera.app.errors.models.ErrorMessage;
+import com.vallacartelera.app.models.Cinema;
 import com.vallacartelera.app.models.Movie;
 import com.vallacartelera.app.services.IMovieService;
 import com.vallacartelera.app.views.Views;
@@ -183,10 +184,34 @@ public class MovieController {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
+	@JsonView(Views.GetAllMovies.class)
 	@PutMapping(path = "/movies/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> update(@Valid @RequestBody Movie movie, BindingResult result) {
-		// TODO
-		return null;
+	public ResponseEntity<?> update(@PathVariable Long id,
+			@Valid @JsonView(Views.GetAllMovies.class) @RequestBody Movie movie, BindingResult result) {
+		Map<String, Object> response = new HashMap<>();
+		if (result.hasErrors()) {
+			List<String> errors = result.getFieldErrors().stream().map(err -> {
+				return "Field '" + err.getField() + "' " + err.getDefaultMessage();
+			}).collect(Collectors.toList());
+
+			response.put("errors", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		Movie movieActual = movieService.findById(id);
+
+		movieActual.setAgeRating(movie.getAgeRating());
+		movieActual.setAgeRatingImg(movie.getAgeRatingImg());
+		movieActual.setDescription(movie.getDescription());
+		movieActual.setDirector(movie.getDescription());
+		movieActual.setImg(movie.getImg());
+		movieActual.setTitle(movie.getTitle());
+		movieActual.setYear(movie.getYear());
+
+		response.put("message", "Movie with ID:" + id + " was updated succesfully!");
+		response.put("cinema", movieService.save(movieActual));
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	@Operation(description = "Delete a Movie from DB.", summary = "Delete Movie", responses = {
