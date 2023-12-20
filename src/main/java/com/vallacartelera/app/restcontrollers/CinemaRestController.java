@@ -1,4 +1,4 @@
-package com.vallacartelera.app.controllers;
+package com.vallacartelera.app.restcontrollers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.vallacartelera.app.errors.models.ErrorMessage;
-import com.vallacartelera.app.models.Session;
-import com.vallacartelera.app.services.ISessionService;
+import com.vallacartelera.app.models.Cinema;
+import com.vallacartelera.app.services.ICinemaService;
 import com.vallacartelera.app.views.Views;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,83 +40,93 @@ import jakarta.validation.Valid;
 //@CrossOrigin(origins = { "http://localhost:4200" })
 @RestController
 @RequestMapping("/api")
-@Tag(name = "Session")
-public class SessionController {
+@Tag(name = "Cinema")
+public class CinemaRestController {
 
 	// TODO:
 	// - Finish PUT method
-	// - Finish showSessionsForMovie and showSessionsForCinema methods
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
-	private ISessionService sessionService;
+	private ICinemaService cinemaService;
 
 	/**
-	 * Returns All Sessions.
+	 * Return list of Cinemas, without Sessions
 	 */
-	@Operation(description = "Returns a List of all Sessions in DB.", summary = "List all Sessions", responses = {
+	@Operation(description = "Returns a List of all Cinemas in DB. Without List of Sessions.", summary = "List all Cinemas. Without Session's List", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Session.class))) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Cinema.class))) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@GetMapping(path = "/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.GetSession.class })
-	public ResponseEntity<?> showAllSessions() {
-		return new ResponseEntity<List<Session>>(sessionService.findAll(), HttpStatus.OK);
+	@GetMapping(path = "/cinemas", produces = MediaType.APPLICATION_JSON_VALUE)
+	@JsonView({ Views.GetAllCinemas.class })
+	public ResponseEntity<?> showAll() {
+		return new ResponseEntity<List<Cinema>>(cinemaService.findAll(), HttpStatus.OK);
 	}
 
-	@Operation(description = "Returns a Session.", summary = "Show One Session", responses = {
+	/**
+	 * Return data from one Cinema, with Sessions
+	 */
+	@Operation(description = "Returns a Cinema. With List of Sessions.", summary = "Show One Cinema. With Session's List.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Session.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Cinema.class)) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@GetMapping(path = "/sessions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.GetSession.class })
-	public ResponseEntity<?> showOneSession(@PathVariable Long id) {
-		return new ResponseEntity<Session>(sessionService.findById(id), HttpStatus.OK);
+	@GetMapping(path = "/cinemas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@JsonView({ Views.GetCinema.class })
+	public ResponseEntity<?> showCinema(@PathVariable Long id) {
+		return new ResponseEntity<Cinema>(cinemaService.findById(id), HttpStatus.OK);
 	}
 
-	@Operation(description = "Returns a List of all Sessions for a Movie.", summary = "List all Sessions for Movie", responses = {
+	/**
+	 * Return a List of Cinemas that have One Movie. Without Sessions
+	 */
+	@Operation(description = "Returns a list of all Cinemas for which a Movie has Sessions. Without List of Sessions.", summary = "List all Cinemas for Movie. Without Session's List", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Session.class))) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Cinema.class))) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@GetMapping(path = "/sessions/movies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.GetSessionForMovie.class })
-	public ResponseEntity<?> showSessionsForMovie(@PathVariable Long id) {
-		return new ResponseEntity<List<Session>>(sessionService.findByMovieId(id), HttpStatus.OK);
+	@GetMapping(path = "/movies/{id}/cinemas", produces = MediaType.APPLICATION_JSON_VALUE)
+	@JsonView({ Views.GetAllCinemas.class })
+	public ResponseEntity<?> showAllCinemasForMovie(@PathVariable Long id) {
+		return new ResponseEntity<List<Cinema>>(cinemaService.findAllByMovieId(id), HttpStatus.OK);
 	}
 
-	@Operation(description = "Returns a List of all Sessions for a Cinema.", summary = "List all Sessions for Cinema", responses = {
+	/**
+	 * Return a Cinema that have a Movie. With Sessions
+	 */
+	@Operation(description = "Returns one Cinema for which a Movie has Sessions. With List of Sessions.", summary = "Show One Cinema for Movie. With Session's List.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Session.class))) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Cinema.class)) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@GetMapping(path = "/sessions/cinemas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView({ Views.GetSessionForCinema.class })
-	public ResponseEntity<?> showSessionsForCinema(@PathVariable Long id) {
-		return new ResponseEntity<List<Session>>(sessionService.findByCinemaId(id), HttpStatus.OK);
+	@GetMapping(path = "/movies/{movie_id}/cinemas/{cinema_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@JsonView({ Views.GetOneCinemasForMovie.class })
+	public ResponseEntity<?> showAllSessionsForCinemaForMovie(@PathVariable Long cinema_id,
+			@PathVariable Long movie_id) {
+		return new ResponseEntity<Cinema>(cinemaService.findByMovieIdAndCinemaId(cinema_id, movie_id), HttpStatus.OK);
 	}
 
-	@Operation(description = "Creates a Session.", summary = "Create Session", responses = {
+	@Operation(description = "Creates a Cinema.", summary = "Create Cinema.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Session.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Cinema.class)) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@PostMapping(path = "/sessions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/cinemas", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> create(@Valid @RequestBody Session session, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @JsonView(Views.GetAllCinemas.class) @RequestBody Cinema cinema,
+			BindingResult result) {
 		Map<String, Object> response = new HashMap<>();
 
 		if (result.hasErrors()) {
@@ -128,22 +138,22 @@ public class SessionController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		response.put("message", "Session created successfully!");
-		response.put("session", sessionService.save(session));
+		response.put("message", "Cinema created successfully!");
+		response.put("cinema", cinemaService.save(cinema));
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
-	@Operation(description = "Update a Session with its Id.", summary = "Update Session", responses = {
+	@Operation(description = "Update a Cinema with its Id.", summary = "Update Cinema.", responses = {
 			@ApiResponse(responseCode = "200", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Session.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Cinema.class)) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@PutMapping(path = "/sessions/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@JsonView(Views.GetSession.class)
+	@JsonView({ Views.GetAllCinemas.class })
+	@PutMapping(path = "/cinemas/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> update(@PathVariable Long id,
-			@Valid @JsonView(Views.GetSession.class) @RequestBody Session session, BindingResult result) {
+			@Valid @JsonView(Views.GetAllCinemas.class) @RequestBody Cinema cinema, BindingResult result) {
 		Map<String, Object> response = new HashMap<>();
 		if (result.hasErrors()) {
 			List<String> errors = result.getFieldErrors().stream().map(err -> {
@@ -154,51 +164,56 @@ public class SessionController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		Session sessionActual = sessionService.findById(id);
+		Cinema cinemaActual = cinemaService.findById(id);
 
-		sessionActual.setCinema(session.getCinema());
-		sessionActual.setMovie(session.getMovie());
-		sessionActual.setLateSession(session.getLateSession());
-		sessionActual.setSessionDate(session.getSessionDate());
+		cinemaActual.setLocation(cinema.getLocation());
+		cinemaActual.setName(cinema.getName());
+		cinemaActual.setPhone(cinema.getPhone());
 
-		response.put("message", "Session with ID:" + id + " was updated succesfully!");
-		response.put("session", sessionService.save(sessionActual));
+		response.put("message", "Cinema with ID:" + id + " was updated succesfully!");
+		response.put("cinema", cinemaService.save(cinemaActual));
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
-	@Operation(description = "Delete a Session from DB.", summary = "Delete Session", responses = {
+	/**
+	 * Delete one Cinema with the id
+	 */
+	@Operation(description = "Delete a Cinema from DB.", summary = "Delete Cinema.", responses = {
 			@ApiResponse(responseCode = "200", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Session.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Cinema.class)) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@DeleteMapping(path = "/sessions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> delete(@PathVariable Long id) {
+	@DeleteMapping(path = "/cinemas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> deleteOne(@PathVariable Long id) {
 		Map<String, Object> response = new HashMap<>();
 
-		sessionService.delete(id);
+		cinemaService.delete(id);
 
-		response.put("message", "Session deleted successfully!");
+		response.put("message", "Cinema deleted successfully!");
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
-	@Operation(description = "Delete all Sessions from DB.", summary = "Delete All Sessions", responses = {
+	/**
+	 * Delete All Cinemas from DB
+	 */
+	@Operation(description = "Delete all Cinemas from DB.", summary = "Delete All Cinemas.", responses = {
 			@ApiResponse(responseCode = "200", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Session.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Cinema.class)) }),
 			@ApiResponse(responseCode = "500", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }),
 			@ApiResponse(responseCode = "404", content = {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorMessage.class)) }) })
-	@DeleteMapping(path = "/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(path = "/cinemas", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> deleteAll() {
 		Map<String, Object> response = new HashMap<>();
 
-		sessionService.deleteAll();
+		cinemaService.deleteAll();
 
-		response.put("message", "All Sessions were deleted successfully!");
+		response.put("message", "All Cinemas were deleted successfully!");
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}

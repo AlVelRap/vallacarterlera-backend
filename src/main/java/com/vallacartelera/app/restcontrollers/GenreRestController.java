@@ -1,4 +1,4 @@
-package com.vallacartelera.app.controllers;
+package com.vallacartelera.app.restcontrollers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Genre")
-public class GenreController {
+public class GenreRestController {
 
 	// TODO:
 	// - Check all errors and returns, and optimize
