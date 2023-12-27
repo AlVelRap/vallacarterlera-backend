@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/layout :: head}"></head>
+
+<body>
+	<div class="container">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>name</th>
+					<th>phone</th>
+					<th>location</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="cinema: ${cinemas}">
+					<td th:text="${cinema.id}"></td>
+					<td th:text="${cinema.name}"></td>
+					<td th:text="${cinema.phone}"></td>
+					<td th:text="${cinema.location}"></td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</body>
+
+</html>
