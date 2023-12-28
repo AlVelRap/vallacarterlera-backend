@@ -20,6 +20,7 @@
 					<td th:text="${cinema.name}"></td>
 					<td th:text="${cinema.phone}"></td>
 					<td th:text="${cinema.location}"></td>
+					<td><a th:href="@{/cinemas/}+${cinema.id}+${'/sessions'}"th:text="'Sessions'"></a></td>
 				</tr>
 			</tbody>
 
