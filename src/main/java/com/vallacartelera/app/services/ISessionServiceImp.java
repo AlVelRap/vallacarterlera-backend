@@ -32,7 +32,6 @@ public class ISessionServiceImp implements ISessionService {
 		return sessionDao.findById(id).orElseThrow(
 				() -> new ResourceNotFoundException("Session with ID: " + id + " doesn´t exists in the DB!"));
 	}
-	
 
 	@Override
 	public List<Session> findByMovieId(Long movieId) {
@@ -46,6 +45,16 @@ public class ISessionServiceImp implements ISessionService {
 	@Override
 	public List<Session> findByCinemaId(Long cinemaId) {
 		List<Session> sessionList = sessionDao.findByCinema_Id(cinemaId);
+		if (sessionList.isEmpty()) {
+			throw new ResourceNotFoundException("There are no Sessions in DB");
+		}
+		return sessionList;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Session> findSessionsForMovieAndForCinema(Long cinemaId, Long movieId) {
+		List<Session> sessionList = sessionDao.findByMovie_IdAndCinema_Id(movieId, cinemaId);
 		if (sessionList.isEmpty()) {
 			throw new ResourceNotFoundException("There are no Sessions in DB");
 		}
