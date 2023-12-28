@@ -32,7 +32,9 @@
 	<div class="container">
 		<p>Cast</p>
 		<ul>
-			<li th:each="actor: ${movie.cast}" th:text="${actor.name}"></li>
+			<li th:each="actor: ${movie.cast}">
+				<a th:text="${actor.name}" th:href="@{/actors/}+${actor.id}"></a>
+			</li>
 		</ul>
 	</div>
 	<div class="container">
