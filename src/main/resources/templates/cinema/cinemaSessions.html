@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/layout :: head}"></head>
+
+<body>
+	<div class="container">
+		<h1 th:text="${cinema.name}"></h1>
+	</div>
+
+	<div class="container">
+		<a th:href="@{'/cinemas/list'}">Volver a Cines</a>
+	</div>
+
+	<div class="container">
+		<div th:each="arraySess: ${movies}">
+			<a th:text="${arraySess[0].movie.title}" th:href="@{/movies/}+${arraySess[0].movie.id}"></a>
+			<ul>
+				<li th:each="sess: ${arraySess}" th:text="${sess.sessionDate}"></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="container">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>Title</th>
+					<th>Late Session</th>
+					<th>Session Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="billboard: ${cinema.sessions}">
+					<td th:text="${billboard.id}"></td>
+					<td th:text="${billboard.movie.title}"></td>
+					<td th:text="${billboard.lateSession}"></td>
+					<td th:text="${billboard.sessionDate}"></td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</body>
+
+</html>
