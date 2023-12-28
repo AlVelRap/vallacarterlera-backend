@@ -38,10 +38,12 @@
 	<div class="container">
 		<p>Genres</p>
 		<ul>
-			<li th:each="genre: ${movie.genre}" th:text="${genre.name}"></li>
+			<li th:each="genre: ${movie.genre}">
+				<a th:text="${genre.name}" th:href="@{/genres/}+${genre.id}"></a>
+			</li>
 		</ul>
 	</div>
-	
+
 	<div class="container">
 		<p>En los cines:</p>
 		<ul>
