@@ -36,7 +36,7 @@ public class CinemaController {
 		List<Cinema> cinemas = cinemaService.findAll();
 		model.addAttribute("cinemas", cinemas);
 		model.addAttribute("title", "Cinema's List");
-		return "cinemaList";
+		return "cinema/cinemaList";
 	}
 
 	@GetMapping(path = "/cinemas/{id}/sessions")
@@ -59,7 +59,7 @@ public class CinemaController {
 		
 		model.put("movies", movies);
 		
-		return "cinemaSessions";
+		return "cinema/cinemaSessions";
 	}
 
 }

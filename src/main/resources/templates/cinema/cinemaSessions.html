@@ -7,20 +7,20 @@
 	<div class="container">
 		<h1 th:text="${cinema.name}"></h1>
 	</div>
-	
+
 	<div class="container">
-		<a th:href="@{'/cinemas/list'}">Volver</a>
+		<a th:href="@{'/cinemas/list'}">Volver a Cines</a>
 	</div>
-	
+
 	<div class="container">
 		<div th:each="arraySess: ${movies}">
-			<h3 th:text="${arraySess[0].movie.title}"></h3>
+			<a th:text="${arraySess[0].movie.title}" th:href="@{/movies/}+${arraySess[0].movie.id}"></a>
 			<ul>
 				<li th:each="sess: ${arraySess}" th:text="${sess.sessionDate}"></li>
 			</ul>
 		</div>
 	</div>
-	
+
 	<div class="container">
 		<table class="table table-striped">
 			<thead>
