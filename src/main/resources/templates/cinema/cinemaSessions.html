@@ -5,23 +5,35 @@
 
 <body>
 	<header th:replace="~{layout/layout :: navbar}"></header>
-	<div class="container">
+	<div class="container mt-3">
 		<h1 th:text="${cinema.name}"></h1>
 	</div>
 
-	<div class="container">
-		<a th:href="@{'/cinemas/list'}">Volver a Cines</a>
-	</div>
-
-	<div class="container">
-		<div th:each="arraySess: ${movies}">
-			<a th:text="${arraySess[0].movie.title}" th:href="@{/movies/}+${arraySess[0].movie.id}"></a>
-			<ul>
-				<li th:each="sess: ${arraySess}" th:text="${sess.sessionDate}"></li>
-			</ul>
+	<div class="container my-3">
+		<div class="row justify-content-center">
+			
+		<a th:each="arraySess: ${movies}" th:href="@{/movies/}+${arraySess[0].movie.id}" class="col-12 col-lg-4 col-md-6 link-underline link-underline-opacity-0">
+			<div class="card mb-3 shadow-sm bg-body-tertiary" style="max-width: 340px;">
+				<div class="row g-0">
+					<div class="col-4">
+						<img th:src="${arraySess[0].movie.img}" class="img-fluid rounded-start shadow-sm"
+							th:alt="${arraySess[0].movie.title}">
+					</div>
+					<div class="col-8">
+						<div class="card-body">
+							<h5 class="card-title" th:text="${arraySess[0].movie.title}"></h5>
+							<p class="card-text">
+								<span class="badge bg-secondary me-1" th:each="sess: ${arraySess}"
+									th:text="${#temporals.format(sess.sessionDate, 'HH:mm')}"></span>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</a>
 		</div>
 	</div>
-
+<!--
 	<div class="container">
 		<table class="table table-striped">
 			<thead>
@@ -43,7 +55,9 @@
 
 		</table>
 	</div>
+	-->
 	<footer th:replace="~{layout/layout :: footer}"></footer>
 </body>
 <script th:replace="~{layout/layout :: scriptBootstrap}"></script>
+
 </html>
