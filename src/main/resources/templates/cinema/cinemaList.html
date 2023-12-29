@@ -5,31 +5,32 @@
 
 <body>
 	<header th:replace="~{layout/layout :: navbar}"></header>
-	<div class="container">
-		<table class="table table-striped">
+	<div class="continer">
+		<h1>Lista de Cines</h1>
+	</div>
+	<div class="container my-4">
+		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
-					<th>id</th>
-					<th>name</th>
-					<th>phone</th>
-					<th>location</th>
+					<th>Nombre</th>
+					<th>Teléfono</th>
+					<th>Ubicación</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr th:each="cinema: ${cinemas}">
-					<td th:text="${cinema.id}"></td>
 					<td th:text="${cinema.name}"></td>
 					<td th:text="${cinema.phone}"></td>
 					<td th:text="${cinema.location}"></td>
-					<td><a th:href="@{/cinemas/}+${cinema.id}+${'/sessions'}" th:text="'Sessions'"></a></td>
+					<td><a class="btn btn-primary" th:href="@{/cinemas/}+${cinema.id}+${'/sessions'}"
+							th:text="'Sesiones'"></a></td>
 				</tr>
 			</tbody>
-
 		</table>
 	</div>
+
 	<footer th:replace="~{layout/layout :: footer}"></footer>
 </body>
-
 <script th:replace="~{layout/layout :: scriptBootstrap}"></script>
-
 </html>
