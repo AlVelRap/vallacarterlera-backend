@@ -4,6 +4,7 @@
 <head th:replace="~{layout/layout :: head}"></head>
 
 <body>
+	<header th:replace="~{layout/layout :: navbar}"></header>
 	<div class="container">
 		<table class="table table-striped">
 			<thead>
@@ -27,5 +28,7 @@
 		</table>
 	</div>
 </body>
+
+<script th:replace="~{layout/layout :: scriptBootstrap}"></script>
 
 </html>
