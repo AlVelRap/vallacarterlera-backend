@@ -5,56 +5,54 @@
 
 <body>
 	<header th:replace="~{layout/layout :: navbar}"></header>
-	<a th:href="@{'/cinemas/list'}">Volver a Cines</a>
-	<div class="container">
-		<h1 th:text="${title}"></h1>
-	</div>
 
-	<div class="container">
-		<img th:src="${movie.img}">
-
-	</div>
-
-	<div class="container">
-		<div class="container">
-			<span th:text="'Año: ' + ${movie.year}"></span>
+	<div class="container bg-light my-4" style="max-width: 800px;">
+		<div class="row border p-2">
+			<div class="col-md-12">
+				<h1 th:text="${title}"></h1>
+			</div>
 		</div>
-		<div class="container">
-			<span th:text="'Director: ' + ${movie.director}"></span>
+		<div class="row border p-2">
+			<div class="col-md-2 col-xs-6 my-3">
+				<div class="d-flex justify-content-center">
+					<img th:src="${movie.img}" class="img-fluid" th:alt="${title}">
+				</div>
+			</div>
+			<div class="col-md-10">
+				<div class="container">
+					<p th:text="${movie.description}">
+				</div>
+				<div class="container">
+					<p><b>Año:</b> <span th:text="${movie.year}"></span></p>
+					<p><b>Director:</b> <span th:text="${movie.director}"></span></p>
+					<p><b>Actores:</b> <span th:each="actor, index : ${movie.cast}">
+							<span><a th:text="${actor.name}" th:href="@{/actors/}+${actor.id}"></a></span>
+							<span th:if="${!index.last}">, </span>
+							<span th:unless="${!index.last}">.</span>
+						</span>
+					</p>
+					<p><b>Clasificación:</b> <span th:text="${movie.ageRating}"></span> <img
+							th:src="${movie.ageRatingImg}"></p>
+					<p><b>Género:</b> <span th:each="genre, index: ${movie.genre}">
+							<span><a th:text="${genre.name}" th:href="@{/genres/}+${genre.id}"></a></span>
+							<span th:if="${!index.last}">, </span>
+							<span th:unless="${!index.last}">.</span>
+						</span>
+					</p>
+				</div>
+
+			</div>
 		</div>
-		<div class="container">
-			<span th:text="'Clasificacion: ' + ${movie.ageRating}"></span><img th:src="${movie.ageRatingImg}">
+		<div class="row border p-2">
+			<div class="col-md-12">
+				<p>En los cines: <span th:each="cinema : ${cinemas}">
+						<a class="badge bg-secondary me-1 link-underline link-underline-opacity-0"
+							th:text="${cinema.name}" th:href="@{/cinemas/}+${cinema.id}+${'/sessions'}"></a>
+					</span></p>
+			</div>
 		</div>
 	</div>
 
-	<div class="container">
-		<p th:text="${movie.description}">
-	</div>
-	<div class="container">
-		<p>Cast</p>
-		<ul>
-			<li th:each="actor: ${movie.cast}">
-				<a th:text="${actor.name}" th:href="@{/actors/}+${actor.id}"></a>
-			</li>
-		</ul>
-	</div>
-	<div class="container">
-		<p>Genres</p>
-		<ul>
-			<li th:each="genre: ${movie.genre}">
-				<a th:text="${genre.name}" th:href="@{/genres/}+${genre.id}"></a>
-			</li>
-		</ul>
-	</div>
-
-	<div class="container">
-		<p>En los cines:</p>
-		<ul>
-			<li th:each="cinema : ${cinemas}">
-				<a th:text="${cinema.name}" th:href="@{/cinemas/}+${cinema.id}+${'/sessions'}"></a>
-			</li>
-		</ul>
-	</div>
 	<footer th:replace="~{layout/layout :: footer}"></footer>
 </body>
 <script th:replace="~{layout/layout :: scriptBootstrap}"></script>
