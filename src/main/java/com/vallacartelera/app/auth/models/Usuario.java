@@ -32,6 +32,10 @@ public class Usuario implements Serializable {
 
 	private boolean enabled;
 
+	public Usuario() {
+		super();
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -56,7 +60,15 @@ public class Usuario implements Serializable {
 		this.password = password;
 	}
 
-	public boolean getEnabled() {
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+
+	public boolean isEnabled() {
 		return enabled;
 	}
 
