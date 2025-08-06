@@ -2,6 +2,9 @@ package com.vallacartelera.app.auth.models;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.vallacartelera.app.views.Views;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,15 +22,17 @@ public class Usuario implements Serializable {
 	private Long id;
 
 	@Column(length = 30, unique = true)
-	@NotNull
+	@JsonView({ Views.Auth.class })
+	@NotNull(groups= {Views.Auth.class})
 	private String username;
 
-	@NotNull
-	@Column(length = 60)
+	@NotNull(groups= {Views.Auth.class})
+	@Column(length = 100)
+	@JsonView({ Views.Auth.class })
 	private String password;
 
 	@NotNull
-	@Column(length = 60)
+	@Column(length = 30)
 	private String salt;
 
 	private boolean enabled;
