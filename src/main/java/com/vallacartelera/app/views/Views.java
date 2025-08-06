@@ -18,4 +18,7 @@ public class Views {
 	public static interface PostActor{};
 	public static interface GetGenre {}
 	public static interface PostGenre{};
+	
+	//Auth
+	public static interface Auth{};
 }
