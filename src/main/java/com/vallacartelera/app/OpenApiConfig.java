@@ -1,12 +1,9 @@
 package com.vallacartelera.app;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 // TODO:
@@ -14,7 +11,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 // - Servers
 // - Email
 // - personal URL
-// - security?? -> Secuity Scheme is added
+// - security?? -> Security Scheme is added
 // I have follow this tutorial:
 // https://www.youtube.com/watch?v=2o_3hjUPAfQ
 
